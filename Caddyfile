@@ -1,0 +1,18 @@
+# 0nutri — reverse proxy HTTPS via Let's Encrypt (DNS-01 com Cloudflare).
+# Acessível só por dispositivos que resolvem 0nutri.santosalex.dev → 192.168.68.105
+# (registro A "DNS only" na Cloudflare; IP é privado, então só LAN alcança).
+
+{
+	email devalexsantos@gmail.com
+}
+
+0nutri.santosalex.dev {
+	encode zstd gzip
+	tls {
+		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+	}
+	reverse_proxy app:3000 {
+		header_up X-Real-IP {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+	}
+}

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { startOfWeek } from "date-fns";
 import { prisma } from "@/lib/prisma";
-import { isoDate } from "@/lib/dates";
+import { dateKey } from "@/lib/dates";
 
 const marmitaSchema = z.object({
   id: z.string().optional(),
@@ -19,13 +19,13 @@ const marmitaSchema = z.object({
 });
 
 function currentWeekStart(now: Date = new Date()) {
-  return new Date(isoDate(startOfWeek(now, { weekStartsOn: 1 })));
+  return dateKey(startOfWeek(now, { weekStartsOn: 1 }));
 }
 
 export async function saveMealPrep(input: z.input<typeof marmitaSchema>) {
   const data = marmitaSchema.parse(input);
   const weekStart = data.weekStartDate
-    ? new Date(isoDate(data.weekStartDate))
+    ? dateKey(data.weekStartDate)
     : currentWeekStart();
 
   if (data.id) {

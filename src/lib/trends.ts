@@ -1,5 +1,5 @@
 import { subDays, differenceInDays } from "date-fns";
-import { isoDate } from "@/lib/dates";
+import { dateKey, isoDate } from "@/lib/dates";
 import { prisma } from "@/lib/prisma";
 
 export type WeightTrendPoint = {
@@ -179,7 +179,7 @@ export async function getCurrentAndPreviousWeek(
   dailyWaterMl: number,
   now: Date = new Date()
 ) {
-  const today = new Date(isoDate(now));
+  const today = dateKey(now);
   const last7Start = subDays(today, 6);
   const prev7End = subDays(today, 7);
   const prev7Start = subDays(today, 13);

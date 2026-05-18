@@ -3,7 +3,7 @@ import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CloseDayForm } from "@/components/today/CloseDayForm";
-import { isoDate } from "@/lib/dates";
+import { dateKey, isoDate } from "@/lib/dates";
 import { getMealsForToday } from "@/lib/meals";
 import { getActivePersona } from "@/lib/persona";
 import { prisma } from "@/lib/prisma";
@@ -23,7 +23,7 @@ export default async function CloseDayPage() {
   }
 
   const now = new Date();
-  const dateOnly = new Date(isoDate(now));
+  const dateOnly = dateKey(now);
   const [meals, consumedMl, summary, weight, score] = await Promise.all([
     getMealsForToday(persona.id, now),
     getTodayWaterIntake(persona.id, now),

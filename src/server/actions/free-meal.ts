@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { isoDate } from "@/lib/dates";
+import { dateKey } from "@/lib/dates";
 
 const freeMealSchema = z.object({
   personaId: z.string().min(1),
@@ -18,7 +18,7 @@ export async function logFreeMeal(input: z.input<typeof freeMealSchema>) {
   await prisma.freeMeal.create({
     data: {
       personaId: data.personaId,
-      date: new Date(isoDate(data.date)),
+      date: dateKey(data.date),
       type: data.type,
       description: data.description,
       impact: data.impact,

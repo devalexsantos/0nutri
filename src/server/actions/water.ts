@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { isoDate } from "@/lib/dates";
+import { dateKey } from "@/lib/dates";
 
 const logWaterSchema = z.object({
   personaId: z.string().min(1),
@@ -20,7 +20,7 @@ export async function logWater(input: z.input<typeof logWaterSchema>) {
       amountMl: data.amountMl,
       notes: data.notes,
       loggedAt: now,
-      date: new Date(isoDate(now)),
+      date: dateKey(now),
     },
   });
   revalidatePath("/today");

@@ -13,7 +13,7 @@ import {
 import { WaterDailyChart } from "@/components/progress/WaterDailyChart";
 import { WeeklyComparisonCard } from "@/components/progress/WeeklyComparisonCard";
 import { WeightTrendWithAverage } from "@/components/progress/WeightTrendWithAverage";
-import { isoDate } from "@/lib/dates";
+import { dateKey, isoDate } from "@/lib/dates";
 import { generateInsights } from "@/lib/insights";
 import { getActivePersona } from "@/lib/persona";
 import { prisma } from "@/lib/prisma";
@@ -38,7 +38,7 @@ export default async function ProgressPage() {
   }
 
   const now = new Date();
-  const today = new Date(isoDate(now));
+  const today = dateKey(now);
   const last30Start = subDays(today, 29);
   const last14Start = subDays(today, 13);
 

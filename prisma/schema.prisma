@@ -41,6 +41,9 @@ model Persona {
   mealPreps         MealPrep[]
   shoppingItems     ShoppingItem[]
   aiCoachReports    AiCoachReport[]
+  pushSubscriptions     PushSubscription[]
+  notificationPreference NotificationPreference?
+  notificationDispatches NotificationDispatch[]
 }
 
 model NutritionProfile {
@@ -316,6 +319,50 @@ model AiCoachReport {
   persona Persona @relation(fields: [personaId], references: [id], onDelete: Cascade)
 
   @@index([personaId, type, createdAt])
+}
+
+model PushSubscription {
+  id         String    @id @default(cuid())
+  personaId  String
+  endpoint   String    @unique
+  p256dh     String
+  auth       String
+  userAgent  String?
+  createdAt  DateTime  @default(now())
+  lastSeenAt DateTime  @default(now())
+  disabledAt DateTime?
+
+  persona Persona @relation(fields: [personaId], references: [id], onDelete: Cascade)
+
+  @@index([personaId])
+}
+
+model NotificationPreference {
+  id              String  @id @default(cuid())
+  personaId       String  @unique
+  mealsEnabled    Boolean @default(true)
+  waterEnabled    Boolean @default(true)
+  dayCloseEnabled Boolean @default(true)
+  freeMealEnabled Boolean @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  persona Persona @relation(fields: [personaId], references: [id], onDelete: Cascade)
+}
+
+model NotificationDispatch {
+  id        String   @id @default(cuid())
+  personaId String
+  kind      String   // meal | water | dayclose | freemeal
+  refKey    String
+  sentAt    DateTime @default(now())
+  status    String   @default("sent") // sent | failed
+  error     String?
+
+  persona Persona @relation(fields: [personaId], references: [id], onDelete: Cascade)
+
+  @@unique([personaId, kind, refKey])
+  @@index([personaId, sentAt])
 }
 
 model AppSettings {

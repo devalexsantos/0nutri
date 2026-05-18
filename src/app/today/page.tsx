@@ -8,7 +8,6 @@ import { DailyCheckinDialog } from "@/components/today/DailyCheckinDialog";
 import { DailyConsistencyCard } from "@/components/today/DailyConsistencyCard";
 import { FreeMealDialog } from "@/components/today/FreeMealDialog";
 import { NextActionCard } from "@/components/today/NextActionCard";
-import { NotificationsManager } from "@/components/pwa/NotificationsManager";
 import { PlannedFreeMeals } from "@/components/today/PlannedFreeMeals";
 import { TodayHeader } from "@/components/today/TodayHeader";
 import { UpcomingMealsList } from "@/components/today/UpcomingMealsList";
@@ -25,7 +24,7 @@ import { getTodayWaterIntake, waterFeedback } from "@/lib/water";
 import { getWeightSummary } from "@/lib/weight";
 import { computeDailyScore, describeScore, persistDailyScore } from "@/lib/score";
 import { pickNextAction } from "@/lib/next-action";
-import { isoDate } from "@/lib/dates";
+import { dateKey, isoDate } from "@/lib/dates";
 import { prisma } from "@/lib/prisma";
 import { Droplet, Scale, Utensils, ClipboardCheck } from "lucide-react";
 
@@ -38,7 +37,7 @@ export default async function TodayPage() {
   }
 
   const now = new Date();
-  const dateOnly = new Date(isoDate(now));
+  const dateOnly = dateKey(now);
 
   const [meals, consumedMl, weightSummary, weightToday, summary, plannedFreeMeals] =
     await Promise.all([
@@ -75,15 +74,6 @@ export default async function TodayPage() {
 
   return (
     <div className="space-y-5">
-      <NotificationsManager
-        meals={meals.map((m) => ({
-          id: m.id,
-          name: m.name,
-          scheduledAt: m.scheduledAt,
-          status: m.status,
-        }))}
-      />
-
       <TodayHeader
         personaName={persona.name}
         totalMeals={meals.length}
@@ -193,7 +183,11 @@ export default async function TodayPage() {
         }))}
       />
 
-      <UpcomingMealsList meals={meals} currentMealId={currentMeal?.id ?? null} />
+      <UpcomingMealsList
+        personaId={persona.id}
+        meals={meals}
+        currentMealId={currentMeal?.id ?? null}
+      />
 
       <div className="text-muted-foreground flex flex-wrap items-center justify-center gap-3 pt-2 text-center text-xs">
         <Link href="/today/close" className="hover:underline">

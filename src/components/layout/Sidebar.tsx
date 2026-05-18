@@ -2,40 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Activity,
-  Apple,
-  Bot,
-  CalendarDays,
-  Camera,
-  Droplet,
-  Heart,
-  LineChart,
-  Scale,
-  Settings,
-  ShoppingCart,
-  Sparkles,
-  UserCircle2,
-  UtensilsCrossed,
-} from "lucide-react";
+import { NAV_ITEMS } from "@/components/layout/nav-items";
 import { cn } from "@/lib/utils";
-
-const NAV_ITEMS = [
-  { href: "/today", label: "Hoje", icon: CalendarDays },
-  { href: "/diet", label: "Dieta", icon: Apple },
-  { href: "/ai-diet", label: "Montar Dieta com IA", icon: Sparkles },
-  { href: "/water", label: "Água", icon: Droplet },
-  { href: "/weight", label: "Peso", icon: Scale },
-  { href: "/progress", label: "Progresso", icon: LineChart },
-  { href: "/coach", label: "Coach IA", icon: Bot },
-  { href: "/shopping", label: "Lista de compras", icon: ShoppingCart },
-  { href: "/marmita", label: "Marmitas", icon: UtensilsCrossed },
-  { href: "/favorites", label: "Favoritos", icon: Heart },
-  { href: "/photos", label: "Fotos", icon: Camera },
-  { href: "/personas", label: "Personas", icon: UserCircle2 },
-  { href: "/usage", label: "Uso da IA", icon: Activity },
-  { href: "/settings", label: "Configurações", icon: Settings },
-] as const;
 
 export function Sidebar() {
   const pathname = usePathname();

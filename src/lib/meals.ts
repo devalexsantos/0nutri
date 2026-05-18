@@ -1,4 +1,4 @@
-import { isoDate, combineDateAndTime, minutesUntil } from "@/lib/dates";
+import { combineDateAndTime, dateKey, minutesUntil } from "@/lib/dates";
 import { prisma } from "@/lib/prisma";
 
 export type MealStatus = "pending" | "done" | "skipped" | "partial";
@@ -45,7 +45,7 @@ export async function getMealsForToday(personaId: string, now: Date = new Date()
   const diet = await getActiveDietForPersona(personaId);
   if (!diet) return [];
 
-  const dateOnly = new Date(isoDate(now));
+  const dateOnly = dateKey(now);
   const logs = await prisma.dailyMealLog.findMany({
     where: { personaId, date: dateOnly },
   });

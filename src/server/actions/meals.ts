@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { isoDate } from "@/lib/dates";
+import { dateKey } from "@/lib/dates";
 
 const updateLogSchema = z.object({
   personaId: z.string().min(1),
@@ -18,7 +18,7 @@ const updateLogSchema = z.object({
 
 export async function setMealStatus(input: z.input<typeof updateLogSchema>) {
   const data = updateLogSchema.parse(input);
-  const dateOnly = new Date(isoDate(data.date));
+  const dateOnly = dateKey(data.date);
 
   const existing = await prisma.dailyMealLog.findUnique({
     where: {

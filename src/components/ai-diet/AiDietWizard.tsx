@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { AlertTriangle, Loader2, Sparkles, Wand2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -48,6 +48,44 @@ const PREP_LABEL: Record<(typeof PREP_PREFS)[number], string> = {
   caseiro: "Comida caseira",
   poucas_receitas: "Poucas receitas diferentes",
 };
+
+function parseCommaList(text: string): string[] {
+  return text
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+function CommaListTextarea({
+  value,
+  onChange,
+  rows,
+}: {
+  value: string[];
+  onChange: (next: string[]) => void;
+  rows?: number;
+}) {
+  const [text, setText] = useState(() => value.join(", "));
+
+  useEffect(() => {
+    const current = parseCommaList(text);
+    const same =
+      current.length === value.length && current.every((v, i) => v === value[i]);
+    if (!same) setText(value.join(", "));
+  }, [value, text]);
+
+  return (
+    <Textarea
+      rows={rows}
+      value={text}
+      onChange={(e) => {
+        const next = e.target.value;
+        setText(next);
+        onChange(parseCommaList(next));
+      }}
+    />
+  );
+}
 
 type WizardProps = {
   personaId: string;
@@ -194,66 +232,34 @@ export function AiDietWizard({
         </CardHeader>
         <CardContent className="space-y-3">
           <Field label="Alimentos base preferidos" hint="Separados por vírgula. Ex: arroz, feijão, frango, ovos">
-            <Textarea
+            <CommaListTextarea
               rows={2}
-              value={profile.preferredFoods.join(", ")}
-              onChange={(e) =>
-                update(
-                  "preferredFoods",
-                  e.target.value
-                    .split(",")
-                    .map((s) => s.trim())
-                    .filter(Boolean)
-                )
-              }
+              value={profile.preferredFoods}
+              onChange={(v) => update("preferredFoods", v)}
             />
           </Field>
           <div className="grid gap-3 md:grid-cols-2">
             <Field label="Alimentos que NÃO gosta" hint="Separados por vírgula">
-              <Textarea
+              <CommaListTextarea
                 rows={2}
-                value={profile.dislikedFoods.join(", ")}
-                onChange={(e) =>
-                  update(
-                    "dislikedFoods",
-                    e.target.value
-                      .split(",")
-                      .map((s) => s.trim())
-                      .filter(Boolean)
-                  )
-                }
+                value={profile.dislikedFoods}
+                onChange={(v) => update("dislikedFoods", v)}
               />
             </Field>
             <Field label="Alergias" hint="Separadas por vírgula">
-              <Textarea
+              <CommaListTextarea
                 rows={2}
-                value={profile.allergies.join(", ")}
-                onChange={(e) =>
-                  update(
-                    "allergies",
-                    e.target.value
-                      .split(",")
-                      .map((s) => s.trim())
-                      .filter(Boolean)
-                  )
-                }
+                value={profile.allergies}
+                onChange={(v) => update("allergies", v)}
               />
             </Field>
           </div>
           <div className="grid gap-3 md:grid-cols-2">
             <Field label="Intolerâncias" hint="Lactose, glúten...">
-              <Textarea
+              <CommaListTextarea
                 rows={2}
-                value={profile.intolerances.join(", ")}
-                onChange={(e) =>
-                  update(
-                    "intolerances",
-                    e.target.value
-                      .split(",")
-                      .map((s) => s.trim())
-                      .filter(Boolean)
-                  )
-                }
+                value={profile.intolerances}
+                onChange={(v) => update("intolerances", v)}
               />
             </Field>
             <Field label="Restrições médicas">

@@ -1,8 +1,8 @@
-import { isoDate } from "@/lib/dates";
+import { dateKey } from "@/lib/dates";
 import { prisma } from "@/lib/prisma";
 
 export async function getTodayWaterIntake(personaId: string, now: Date = new Date()) {
-  const dateOnly = new Date(isoDate(now));
+  const dateOnly = dateKey(now);
   const result = await prisma.waterLog.aggregate({
     where: { personaId, date: dateOnly },
     _sum: { amountMl: true },
@@ -11,7 +11,7 @@ export async function getTodayWaterIntake(personaId: string, now: Date = new Dat
 }
 
 export async function listWaterLogsForDate(personaId: string, date: Date = new Date()) {
-  const dateOnly = new Date(isoDate(date));
+  const dateOnly = dateKey(date);
   return prisma.waterLog.findMany({
     where: { personaId, date: dateOnly },
     orderBy: { loggedAt: "asc" },

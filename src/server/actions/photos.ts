@@ -5,7 +5,7 @@ import path from "node:path";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { isoDate } from "@/lib/dates";
+import { dateKey, isoDate, parseDateKey } from "@/lib/dates";
 
 const UPLOAD_ROOT = path.join(process.cwd(), "public", "uploads");
 
@@ -20,7 +20,7 @@ export async function uploadProgressPhoto(formData: FormData) {
   const notes = String(formData.get("notes") ?? "") || null;
   const file = formData.get("file");
   const dateStr = String(formData.get("date") ?? "");
-  const date = dateStr ? new Date(dateStr) : new Date();
+  const date = dateStr ? parseDateKey(dateStr) : new Date();
 
   if (!personaId) throw new Error("personaId obrigatório.");
   if (!(file instanceof File)) throw new Error("Selecione um arquivo de imagem.");
@@ -55,7 +55,7 @@ export async function uploadProgressPhoto(formData: FormData) {
       personaId,
       imageUrl,
       type,
-      date: new Date(isoDate(date)),
+      date: dateKey(date),
       notes,
     },
   });

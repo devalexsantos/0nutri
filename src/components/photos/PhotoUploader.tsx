@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { todayIsoSp } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 import { uploadProgressPhoto } from "@/server/actions/photos";
 
@@ -17,7 +18,7 @@ const TYPES = [
 ];
 
 export function PhotoUploader({ personaId }: { personaId: string }) {
-  const todayIso = new Date().toISOString().slice(0, 10);
+  const todayIso = todayIsoSp();
   const [type, setType] = useState("frente");
   const [date, setDate] = useState(todayIso);
   const [notes, setNotes] = useState("");

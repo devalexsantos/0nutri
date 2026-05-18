@@ -6,11 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { parseDateKey, todayIsoSp } from "@/lib/dates";
 import { logWeight } from "@/server/actions/weight";
 import { toast } from "sonner";
 
 export function WeightForm({ personaId }: { personaId: string }) {
-  const todayIso = new Date().toISOString().slice(0, 10);
+  const todayIso = todayIsoSp();
   const [weight, setWeight] = useState("");
   const [date, setDate] = useState(todayIso);
   const [notes, setNotes] = useState("");
@@ -25,7 +26,7 @@ export function WeightForm({ personaId }: { personaId: string }) {
     }
     startTransition(async () => {
       try {
-        await logWeight({ personaId, weightKg: n, date: new Date(date), notes });
+        await logWeight({ personaId, weightKg: n, date: parseDateKey(date), notes });
         setWeight("");
         setNotes("");
         toast.success(`Peso de ${n}kg registrado.`);

@@ -1,4 +1,4 @@
-import { isoDate } from "@/lib/dates";
+import { dateKey } from "@/lib/dates";
 import { prisma } from "@/lib/prisma";
 import { getMealsForToday } from "@/lib/meals";
 import { getTodayWaterIntake } from "@/lib/water";
@@ -26,7 +26,7 @@ export async function computeDailyScore(
   dailyWaterMl: number,
   now: Date = new Date()
 ): Promise<DailyScore> {
-  const dateOnly = new Date(isoDate(now));
+  const dateOnly = dateKey(now);
   const [meals, consumedMl, summary] = await Promise.all([
     getMealsForToday(personaId, now),
     getTodayWaterIntake(personaId, now),
@@ -71,7 +71,7 @@ export async function computeDailyScore(
 }
 
 export async function persistDailyScore(personaId: string, score: DailyScore, now: Date = new Date()) {
-  const dateOnly = new Date(isoDate(now));
+  const dateOnly = dateKey(now);
   await prisma.dailySummary.upsert({
     where: { personaId_date: { personaId, date: dateOnly } },
     create: {

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { isoDate } from "@/lib/dates";
+import { dateKey } from "@/lib/dates";
 
 const checkinSchema = z.object({
   personaId: z.string().min(1),
@@ -16,7 +16,7 @@ const checkinSchema = z.object({
 
 export async function saveDailyCheckin(input: z.input<typeof checkinSchema>) {
   const data = checkinSchema.parse(input);
-  const dateOnly = new Date(isoDate(data.date));
+  const dateOnly = dateKey(data.date);
 
   await prisma.dailySummary.upsert({
     where: { personaId_date: { personaId: data.personaId, date: dateOnly } },

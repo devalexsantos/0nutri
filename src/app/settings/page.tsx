@@ -4,6 +4,7 @@ import { NotificationsSettings } from "@/components/settings/NotificationsSettin
 import { SettingsForm } from "@/components/settings/SettingsForm";
 import { getActivePersonaId, listPersonas } from "@/lib/persona";
 import { prisma } from "@/lib/prisma";
+import { getNotificationPreferences } from "@/server/actions/notifications";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +14,14 @@ export default async function SettingsPage() {
     listPersonas(),
     getActivePersonaId(),
   ]);
+  const notificationPrefs = activePersonaId
+    ? await getNotificationPreferences(activePersonaId)
+    : {
+        mealsEnabled: true,
+        waterEnabled: true,
+        dayCloseEnabled: true,
+        freeMealEnabled: true,
+      };
   const effectiveSettings = settings ?? {
     theme: "light",
     showCalories: false,
@@ -46,7 +55,15 @@ export default async function SettingsPage() {
         </CardContent>
       </Card>
 
-      <NotificationsSettings />
+      <NotificationsSettings
+        personaId={activePersonaId}
+        initialPrefs={{
+          mealsEnabled: notificationPrefs.mealsEnabled,
+          waterEnabled: notificationPrefs.waterEnabled,
+          dayCloseEnabled: notificationPrefs.dayCloseEnabled,
+          freeMealEnabled: notificationPrefs.freeMealEnabled,
+        }}
+      />
 
       <BackupSection
         personas={personas.map((p) => ({ id: p.id, name: p.name }))}

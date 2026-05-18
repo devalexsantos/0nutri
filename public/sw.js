@@ -4,7 +4,7 @@
 // - Assets estáticos (_next/static, ícones): cache-first
 // - Demais: network-first com fallback opcional
 
-const CACHE_VERSION = "0nutri-v1";
+const CACHE_VERSION = "0nutri-v2";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -83,3 +83,49 @@ async function networkFirst(request) {
     throw err;
   }
 }
+
+// Web Push — iOS desinscreve push silencioso, então sempre mostramos a notificação.
+self.addEventListener("push", (event) => {
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch (_e) {
+    data = { title: "0nutri", body: event.data ? event.data.text() : "" };
+  }
+  const title = data.title || "0nutri";
+  const body = data.body || "";
+  const url = data.url || "/today";
+  const tag = data.tag || "0nutri";
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body,
+      tag,
+      icon: "/icon.svg",
+      badge: "/icon.svg",
+      data: { url },
+      renotify: false,
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const target = (event.notification.data && event.notification.data.url) || "/today";
+  event.waitUntil(
+    (async () => {
+      const all = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+      const existing = all.find((c) => c.url.startsWith(self.location.origin));
+      if (existing) {
+        await existing.focus();
+        try {
+          await existing.navigate(target);
+        } catch (_e) {
+          // navigate pode falhar em SW antigo / iOS — abre em nova janela como fallback
+          await self.clients.openWindow(target);
+        }
+        return;
+      }
+      await self.clients.openWindow(target);
+    })()
+  );
+});

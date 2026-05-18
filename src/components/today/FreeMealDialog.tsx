@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { parseDateKey, todayIsoSp } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 import { logFreeMeal } from "@/server/actions/free-meal";
 
@@ -37,7 +38,7 @@ const IMPACTS = [
 ];
 
 export function FreeMealDialog({ personaId }: { personaId: string }) {
-  const todayIso = new Date().toISOString().slice(0, 10);
+  const todayIso = todayIsoSp();
   const [open, setOpen] = useState(false);
   const [type, setType] = useState<string>("");
   const [date, setDate] = useState(todayIso);
@@ -66,7 +67,7 @@ export function FreeMealDialog({ personaId }: { personaId: string }) {
           type,
           description: description || undefined,
           impact: isFuture ? undefined : impact || undefined,
-          date: new Date(date),
+          date: parseDateKey(date),
         });
         toast.success(
           isFuture

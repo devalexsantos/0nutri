@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { subDays } from "date-fns";
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
-import { isoDate } from "@/lib/dates";
+import { dateKey, isoDate } from "@/lib/dates";
 import { prisma } from "@/lib/prisma";
 import { getOpenAI, isOpenAIConfigured } from "@/lib/openai";
 import {
@@ -38,7 +38,7 @@ export async function generateWeeklyReview(personaId: string): Promise<WeeklyRev
   if (!persona) throw new Error("Persona não encontrada.");
 
   const now = new Date();
-  const today = new Date(isoDate(now));
+  const today = dateKey(now);
   const start = subDays(today, 6);
 
   const [summaries, weights, waterAgg, mealLogs, freeMeals] = await Promise.all([

@@ -2,7 +2,8 @@
 # 0nutri — build multi-stage. Aproveita o output: 'standalone' do Next.js.
 
 FROM node:22-alpine AS base
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat tzdata
+ENV TZ=America/Sao_Paulo
 
 # ----- deps -----
 FROM base AS deps

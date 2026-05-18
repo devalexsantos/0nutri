@@ -4,7 +4,7 @@ import { ChevronLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { isoDate } from "@/lib/dates";
+import { isoDate, parseDateKey } from "@/lib/dates";
 import { getActiveDietForPersona } from "@/lib/meals";
 import { getActivePersona } from "@/lib/persona";
 import { prisma } from "@/lib/prisma";
@@ -36,7 +36,7 @@ export default async function PastDayPage({
     );
   }
 
-  const dateOnly = new Date(date);
+  const dateOnly = parseDateKey(date);
   const today = isoDate(new Date());
 
   const [diet, summary, mealLogs, waterTotal, weight] = await Promise.all([

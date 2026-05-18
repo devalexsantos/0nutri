@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { isoDate } from "@/lib/dates";
+import { dateKey } from "@/lib/dates";
 
 const weightSchema = z.object({
   personaId: z.string().min(1),
@@ -18,7 +18,7 @@ export async function logWeight(input: z.input<typeof weightSchema>) {
     data: {
       personaId: data.personaId,
       weightKg: data.weightKg,
-      date: new Date(isoDate(data.date)),
+      date: dateKey(data.date),
       notes: data.notes,
     },
   });

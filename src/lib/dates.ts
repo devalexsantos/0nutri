@@ -47,3 +47,30 @@ export function nextDay(d: Date) {
 export function isoDate(d: Date): string {
   return format(d, "yyyy-MM-dd");
 }
+
+/**
+ * Canonical "date key" para colunas DateTime que representam um dia de calendário.
+ * Retorna o instante de meia-noite no fuso de São Paulo (UTC-3, sem DST desde 2019)
+ * do dia SP que contém `d`. Use em writes/queries de campos como `DailyMealLog.date`.
+ */
+export function dateKey(d: Date = new Date()): Date {
+  return new Date(`${isoDate(d)}T00:00:00-03:00`);
+}
+
+/** Parse de "YYYY-MM-DD" como meia-noite SP, espelhando `dateKey`. */
+export function parseDateKey(iso: string): Date {
+  return new Date(`${iso}T00:00:00-03:00`);
+}
+
+/**
+ * "YYYY-MM-DD" no fuso de São Paulo. Funciona no servidor (independe de TZ) e
+ * no cliente (independe do fuso do browser do usuário).
+ */
+export function todayIsoSp(now: Date = new Date()): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Sao_Paulo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(now);
+}
