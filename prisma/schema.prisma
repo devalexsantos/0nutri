@@ -1,0 +1,331 @@
+// Prisma 7 — URL e env vivem em prisma.config.ts
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+  moduleFormat = "esm"
+}
+
+model Persona {
+  id              String   @id @default(cuid())
+  name            String
+  avatar          String?
+  color           String?
+  age             Int?
+  sex             String?
+  heightCm        Int?
+  initialWeightKg Float?
+  targetWeightKg  Float?
+  dailyWaterMl    Int      @default(3000)
+  goal            String?
+  activityLevel   String?
+  region          String?
+  isActive        Boolean  @default(true)
+  startDate       DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  diets             Diet[]
+  weightLogs        WeightLog[]
+  waterLogs         WaterLog[]
+  dailyMealLogs     DailyMealLog[]
+  dailySummaries    DailySummary[]
+  favoriteFoods     FavoriteFood[]
+  progressPhotos    ProgressPhoto[]
+  nutritionProfile  NutritionProfile?
+  aiDietGenerations AiDietGeneration[]
+  freeMeals         FreeMeal[]
+  mealPreps         MealPrep[]
+  shoppingItems     ShoppingItem[]
+  aiCoachReports    AiCoachReport[]
+}
+
+model NutritionProfile {
+  id                    String   @id @default(cuid())
+  personaId             String   @unique
+  wakeTime              String?
+  sleepTime             String?
+  workRoutine           String?
+  trainingRoutine       String?
+  desiredMealsPerDay    Int?
+  mainDifficulty        String?
+  foodPreferences       String[] @default([])
+  dislikedFoods         String[] @default([])
+  allergies             String[] @default([])
+  intolerances          String[] @default([])
+  medicalRestrictions   String?
+  budgetLevel           String?
+  preparationPreference String?
+  preferredFoods        String[] @default([])
+  showCalories          Boolean  @default(false)
+  showMacros            Boolean  @default(false)
+  includeShoppingList   Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  persona Persona @relation(fields: [personaId], references: [id], onDelete: Cascade)
+}
+
+model AiDietGeneration {
+  id             String   @id @default(cuid())
+  personaId      String
+  promptVersion  String?
+  status         String   @default("draft") // draft | imported | error
+  inputSnapshot  Json
+  outputJson     Json?
+  importedDietId String?
+  errorMessage   String?
+  model          String?
+  tokensIn       Int?
+  tokensOut      Int?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  persona      Persona @relation(fields: [personaId], references: [id], onDelete: Cascade)
+  importedDiet Diet?   @relation(fields: [importedDietId], references: [id], onDelete: SetNull)
+}
+
+model Diet {
+  id          String    @id @default(cuid())
+  personaId   String
+  name        String
+  description String?
+  objective   String?
+  isActive    Boolean   @default(false)
+  startDate   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  persona       Persona            @relation(fields: [personaId], references: [id], onDelete: Cascade)
+  meals         Meal[]
+  aiGenerations AiDietGeneration[]
+}
+
+model Meal {
+  id          String   @id @default(cuid())
+  dietId      String
+  name        String
+  description String?
+  scheduledAt String // "HH:mm"
+  sortOrder   Int      @default(0)
+  isOptional  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  diet    Diet           @relation(fields: [dietId], references: [id], onDelete: Cascade)
+  options MealOption[]
+  logs    DailyMealLog[]
+}
+
+model MealOption {
+  id           String   @id @default(cuid())
+  mealId       String
+  name         String
+  description  String?
+  calories     Int?
+  proteinGrams Float?
+  carbsGrams   Float?
+  fatGrams     Float?
+  notes        String?
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  meal      Meal           @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  foodItems FoodItem[]
+  logs      DailyMealLog[]
+}
+
+model FoodItem {
+  id           String   @id @default(cuid())
+  mealOptionId String
+  name         String
+  quantity     Float?
+  unit         String?
+  notes        String?
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  mealOption MealOption @relation(fields: [mealOptionId], references: [id], onDelete: Cascade)
+}
+
+model DailyMealLog {
+  id           String    @id @default(cuid())
+  personaId    String
+  mealId       String
+  mealOptionId String?
+  date         DateTime  @db.Date
+  status       String // pending | done | skipped | partial
+  completedAt  DateTime?
+  hungerLevel  Int?
+  feeling      String?
+  notes        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  persona    Persona     @relation(fields: [personaId], references: [id], onDelete: Cascade)
+  meal       Meal        @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  mealOption MealOption? @relation(fields: [mealOptionId], references: [id], onDelete: SetNull)
+
+  @@unique([personaId, mealId, date])
+}
+
+model WaterLog {
+  id        String   @id @default(cuid())
+  personaId String
+  amountMl  Int
+  loggedAt  DateTime @default(now())
+  date      DateTime @db.Date
+  notes     String?
+  createdAt DateTime @default(now())
+
+  persona Persona @relation(fields: [personaId], references: [id], onDelete: Cascade)
+
+  @@index([personaId, date])
+}
+
+model WeightLog {
+  id        String   @id @default(cuid())
+  personaId String
+  weightKg  Float
+  date      DateTime @db.Date
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  persona Persona @relation(fields: [personaId], references: [id], onDelete: Cascade)
+
+  @@index([personaId, date])
+}
+
+model DailySummary {
+  id           String   @id @default(cuid())
+  personaId    String
+  date         DateTime @db.Date
+  mealsScore   Int?
+  waterScore   Int?
+  overallScore Int?
+  energyLevel  Int?
+  moodLevel    Int?
+  hungerLevel  Int?
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  persona Persona @relation(fields: [personaId], references: [id], onDelete: Cascade)
+
+  @@unique([personaId, date])
+}
+
+model FavoriteFood {
+  id              String   @id @default(cuid())
+  personaId       String
+  name            String
+  defaultQuantity Float?
+  defaultUnit     String?
+  calories        Int?
+  proteinGrams    Float?
+  carbsGrams      Float?
+  fatGrams        Float?
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  persona Persona @relation(fields: [personaId], references: [id], onDelete: Cascade)
+}
+
+model ProgressPhoto {
+  id        String   @id @default(cuid())
+  personaId String
+  imageUrl  String
+  type      String? // front | side | back
+  date      DateTime @db.Date
+  notes     String?
+  createdAt DateTime @default(now())
+
+  persona Persona @relation(fields: [personaId], references: [id], onDelete: Cascade)
+}
+
+model FreeMeal {
+  id          String   @id @default(cuid())
+  personaId   String
+  date        DateTime @db.Date
+  type        String // pizza, hamburguer, sushi, churrasco, doce, outro
+  description String?
+  impact      String? // tranquilo, exagerei, sem culpa, atrapalhou
+  createdAt   DateTime @default(now())
+
+  persona Persona @relation(fields: [personaId], references: [id], onDelete: Cascade)
+
+  @@index([personaId, date])
+}
+
+model MealPrep {
+  id           String   @id @default(cuid())
+  personaId    String
+  weekStartDate DateTime @db.Date
+  name         String // ex: "Marmitas de quarta"
+  portions     Int      @default(5)
+  protein      String?  // ex: "frango grelhado"
+  carb         String?  // ex: "arroz integral"
+  vegetables   String?  // ex: "brócolis, cenoura"
+  notes        String?
+  done         Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  persona Persona @relation(fields: [personaId], references: [id], onDelete: Cascade)
+
+  @@index([personaId, weekStartDate])
+}
+
+model ShoppingItem {
+  id        String   @id @default(cuid())
+  personaId String
+  name      String
+  quantity  String? // ex: "1.5kg" — string para flexibilidade
+  category  String? // proteína | carb | verdura | fruta | outros
+  checked   Boolean  @default(false)
+  source    String? // auto | manual
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  persona Persona @relation(fields: [personaId], references: [id], onDelete: Cascade)
+
+  @@index([personaId])
+}
+
+model AiCoachReport {
+  id          String   @id @default(cuid())
+  personaId   String
+  type        String // weekly_review | substitutions | smart_shopping | diet_variant
+  periodStart DateTime? @db.Date
+  periodEnd   DateTime? @db.Date
+  inputSnapshot Json
+  outputJson  Json
+  summary     String?  // resumo curto para listagem
+  model       String?  // ex: gpt-4o-mini
+  tokensIn    Int?
+  tokensOut   Int?
+  createdAt   DateTime @default(now())
+
+  persona Persona @relation(fields: [personaId], references: [id], onDelete: Cascade)
+
+  @@index([personaId, type, createdAt])
+}
+
+model AppSettings {
+  id              String   @id @default(cuid())
+  activePersonaId String?
+  theme           String   @default("light")
+  showCalories    Boolean  @default(false)
+  showMacros      Boolean  @default(false)
+  dayStartTime    String   @default("06:00")
+  dayEndTime      String   @default("23:00")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}

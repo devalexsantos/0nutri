@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: 0nutri-db-dev
+    restart: unless-stopped
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: zeronutri
+    volumes:
+      - zeronutri_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d zeronutri"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  zeronutri_postgres_data:

@@ -1,0 +1,49 @@
+import { format, startOfDay, endOfDay, addDays, differenceInMinutes, parse } from "date-fns";
+import { ptBR } from "date-fns/locale";
+
+export const TZ = "America/Sao_Paulo";
+
+export function todayStart(now: Date = new Date()) {
+  return startOfDay(now);
+}
+
+export function todayEnd(now: Date = new Date()) {
+  return endOfDay(now);
+}
+
+export function formatDateLong(date: Date) {
+  return format(date, "EEEE, d 'de' MMMM", { locale: ptBR });
+}
+
+export function formatDate(date: Date) {
+  return format(date, "dd/MM/yyyy");
+}
+
+export function formatTime(date: Date) {
+  return format(date, "HH:mm");
+}
+
+/** Combina uma data com um horário "HH:mm" e retorna um Date. */
+export function combineDateAndTime(date: Date, time: string): Date {
+  const [h, m] = time.split(":").map((n) => Number.parseInt(n, 10));
+  const d = new Date(date);
+  d.setHours(h ?? 0, m ?? 0, 0, 0);
+  return d;
+}
+
+export function parseTime(time: string, base: Date = new Date()): Date {
+  return parse(time, "HH:mm", base);
+}
+
+export function minutesUntil(targetTime: string, from: Date = new Date()): number {
+  const target = combineDateAndTime(from, targetTime);
+  return differenceInMinutes(target, from);
+}
+
+export function nextDay(d: Date) {
+  return addDays(d, 1);
+}
+
+export function isoDate(d: Date): string {
+  return format(d, "yyyy-MM-dd");
+}

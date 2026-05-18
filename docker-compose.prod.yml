@@ -1,0 +1,50 @@
+name: zeronutri
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: zeronutri-app:latest
+    container_name: 0nutri-app
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@db:5432/zeronutri
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      NODE_ENV: production
+    volumes:
+      - zeronutri_uploads:/app/public/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/today"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  db:
+    image: postgres:17-alpine
+    container_name: 0nutri-db
+    restart: unless-stopped
+    ports:
+      # No homelab altere DB_PORT se 5432 estiver ocupado
+      - "${DB_PORT:-5432}:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: zeronutri
+    volumes:
+      - zeronutri_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d zeronutri"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  zeronutri_postgres_data:
+  zeronutri_uploads:

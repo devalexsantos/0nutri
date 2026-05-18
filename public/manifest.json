@@ -1,0 +1,50 @@
+{
+  "name": "0nutri — Painel pessoal",
+  "short_name": "0nutri",
+  "description": "Painel pessoal de dieta, água, peso e progresso, com múltiplas personas.",
+  "start_url": "/today",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f8fafc",
+  "theme_color": "#10b981",
+  "lang": "pt-BR",
+  "categories": ["health", "lifestyle", "productivity"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Registrar água",
+      "short_name": "Água",
+      "description": "Registrar consumo de água",
+      "url": "/water",
+      "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "Refeição de hoje",
+      "short_name": "Hoje",
+      "description": "Ver refeição atual",
+      "url": "/today",
+      "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "Registrar peso",
+      "short_name": "Peso",
+      "description": "Cadastrar peso do dia",
+      "url": "/weight",
+      "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    }
+  ]
+}
